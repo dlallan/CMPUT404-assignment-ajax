@@ -21,7 +21,7 @@
 #     pip install flask
 
 
-from flask import Flask, redirect, request
+from flask import Flask, jsonify, redirect, request
 import json
 
 app = Flask(__name__)
@@ -85,7 +85,7 @@ def hello():
 @app.route("/entity/<entity>", methods=['POST', 'PUT'])
 def update(entity):
     '''update the entities via this interface'''
-    return None
+    return jsonify({'foo': 'bar'}) # TODO
 
 
 @app.route("/world", methods=['POST', 'GET'])
