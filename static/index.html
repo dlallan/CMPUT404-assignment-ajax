@@ -30,32 +30,41 @@
 
 
         function sendJSONXMLHTTPRequest(url, objects, callback) {
+            if (objects == null) {
+                alert("objects is null");
+            }
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
                     try {
                         if (xhr.status == 200) {
-                            //XXX: parse some JSON from the request!
-                            const responseType = xhr.getResponseHeader('Content-Type');
-                            if (responseType === 'application/json') {
-                                //XXX: Pass the data to the callback!
-                                callback(xhr.response);
+                            // parse some JSON from the request
+                            if (!xhr.response) {
+                                console.warn("POST/PUT response was empty");
+                            } else {
+                                const responseType = xhr.getResponseHeader('Content-Type');
+                                if (responseType === 'application/json') {
+                                    // Pass the data to the callback
+                                    parsedData = JSON.parse(xhr.response)
+                                    callback?.call(callback, parsedData);
+                                } else {
+                                    console.warn(`The server responded with unexpected type ${responseType}`);
+                                }
                             }
-                            console.warn(`The server responded with unexpected type ${responseType}`);
                         }
                     }
                     catch (e) {
-                        alert('Error: ' + e.name);
+                        console.error('Error: ' + e.name);
                     }
                 }
             };
-            //XXX: POST to a URL
-            //XXX: set the mimetype and the accept headers!
-            // Remember to use application/json !
-            xhr.open('POST', url, JSON.stringify(objects), true);
+            // POST the JSON entity to the server
+            xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
+
+            // Expect JSON in return from the server
             xhr.setRequestHeader('Accept', 'application/json');
-            xhr.send();
+            xhr.send(JSON.stringify(objects));
         }
 
 
@@ -68,7 +77,6 @@
                 lineWidth = 3;
                 var x = entity["x"];
                 var y = entity["y"];
-                //moveTo(x,y);
                 fillStyle = entity["colour"];
                 strokeStyle = fillStyle;
                 arc(x, y, (entity["radius"]) ? entity["radius"] : 50, 0, 2.0 * Math.PI, false);
@@ -122,7 +130,6 @@
 
         // This is unpleasent, canvas clicks are not handled well
         // So use this code, it works well on multitouch devices as well.
-
         function getPosition(e) {
             if (e.targetTouches && e.targetTouches.length > 0) {
                 var touch = e.targetTouches[0];
@@ -143,13 +150,12 @@
         function addEntity(entity, data) {
             world[entity] = data;
             drawNextFrame(); // (but should we?)
-            //XXX: Send a XHTML Request that updates the entity you just  modified!
+            // Send the updated entity to the server
             sendJSONXMLHTTPRequest(`/entity/${entity}`, data, null);
         }
 
         var counter = 0;
         function addEntityWithoutName(data) {
-            //var name = "X"+Math.floor((Math.random()*100)+1);
             var name = "X" + (counter++) % 100;
             addEntity(name, data);
         }
@@ -192,21 +198,17 @@
                         var y = pos[1];
                         self.clicked = 1;
                         self.callListeners(self.mousedowners, x, y, self.clicked, e);
-                        //addEntityWithoutName({'x':x,'y':y,'colour':'red'});
                     }
                 },
                 mouseup: function (e) {
                     e.preventDefault();
-                    //alert(getPosition(e));
                     if (self.wasClicked(e)) {
                         var pos = getPosition(e);
                         var x = pos[0];
                         var y = pos[1];
-                        //self.poppin(x,y);
                         self.clicked = 0;
                         self.selected = -1;
                         self.callListeners(self.mouseuppers, x, y, self.clicked, e);
-                        //addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
                     }
                 },
                 touchstart: function (e) {
@@ -224,7 +226,6 @@
                         var x = pos[0];
                         var y = pos[1];
                         if (self.clicked != 0) {
-                            //self.squeakin(x,y);
                             self.callListeners(self.mousedraggers, x, y, self.clicked, e);
                         }
                         self.callListeners(self.mousemovers, x, y, self.clicked, e);
@@ -269,15 +270,19 @@
 
 
         function update() {
-            //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-            drawFrame();
+            // Get the world from the webservice
+            fetch('/world', { accept: 'application/json' })
+                .then(response => response.json())
+                .catch(reason => console.error(reason))
+                .then(newWorld => {
+                    world = Object.assign(world, newWorld);
+                    drawNext = true;
+                    drawFrame();
+                });
         }
 
         // 30 frames per second
         setInterval(update, 1000 / 30.0);
-
-
-
     </script>
 </body>
 

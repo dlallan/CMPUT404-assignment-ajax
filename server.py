@@ -85,14 +85,20 @@ def hello():
 @app.route("/entity/<entity>", methods=['POST', 'PUT'])
 def update(entity):
     '''update the entities via this interface'''
-    myWorld.set(entity, json.loads(request.data))
-    return jsonify(myWorld.get(entity))
+    # if request.mimetype == 'application/json' and request.data:
+    #     myWorld.set(entity, request.json)
+    #     return jsonify(myWorld.get(entity))
+    # return {}
+    if not request.data:
+        return {}
+    myWorld.set(entity, flask_post_json())
+    return myWorld.get(entity)
 
 
 @app.route("/world", methods=['POST', 'GET'])
 def world():
     '''you should probably return the world here'''
-    return jsonify(myWorld.world())
+    return myWorld.world()
 
 
 @app.route("/entity/<entity>")
