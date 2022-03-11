@@ -49,19 +49,19 @@
    - [x] The webservice can serve /static/index.html
    - [x] static/index.html displays the current state of the webservice
    - [x] static/index.html responds to clicks within 100ms on average
-   - [ ] Make static/index.html images look nice
-   - [ ] implement anything marked XXX TODO: in static/index.html
+   - [x] Make static/index.html images look nice
+   - [x] implement anything marked XXX TODO: in static/index.html
    - [x] /clear returns the current state of the world {}
    - [x] PUT returns the object that was PUT. 
-   - [ ] http://hostname:5000/static/index.html will work to produce the UI
+   - [x] http://hostname:5000/static/index.html will work to produce the UI
          (so http://127.0.0.1:5000/static/index.html should work and http://localhost:5000/static/index.html should work)
    - [x] Doesn't abuse POST, doesn't poll /world with POST method.
 
  
 ** Restrictions
-   - [ ] Use Python 3.6
-   - [ ] Must run in the VM (Ubuntu 18.10)
-   - [ ] License your code properly (use an OSI approved license)
+   - [x] Use Python 3.6
+   - [x] Must run in the VM (Ubuntu 18.10)
+   - [x] License your code properly (use an OSI approved license)
      - Put your name on it!
 
 ** Submission Instructions
