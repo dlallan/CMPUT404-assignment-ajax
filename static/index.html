@@ -148,7 +148,6 @@
 
         function addEntity(entity, data) {
             world[entity] = data;
-            drawNextFrame(); // (but should we?)
             // Send the updated entity to the server
             sendJSONXMLHTTPRequest(`/entity/${entity}`, data, null);
         }
